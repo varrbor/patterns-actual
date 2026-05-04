@@ -1,34 +1,26 @@
-class AutoNews {
-    constructor() {
-        this.news = "";
-        this.actions = [];
-    }
-    setNews(text) {
-        this.news = text;
-        this.notifyAll();
-    }
-    notifyAll() {
-        return this.actions.forEach((subs) => subs.inform(this));
-    }
-    register(observer) {
-        return this.actions.push(observer);
-    }
-    unregister(observer) {
-        this.actions = this.actions.filter((el) => !el instanceof observer);
-    }
+class ThirdPartyLogger {
+  write(message) {
+    console.log("Third-party:", message);
+  }
 }
-class Jack {
-    inform(message) {
-        console.log(`Jack has been informed about: ${message.news}`);
-    }
-}
-class Max {
-    inform(message) {
-        console.log(`Max has been informed about: ${message.news}`);
-    }
-}
-const autoNews = new AutoNews();
-autoNews.register(new Jack());
-autoNews.register(new Max());
 
-console.log(autoNews.setNews("New tesla price is 40000"));
+class Logger {
+  log(message) {}
+}
+
+class LoggerAdapter extends Logger {
+  constructor(thirdPartyLogger) {
+    super();
+    this.thirdPartyLogger = thirdPartyLogger;
+  }
+
+  log(message) {
+    // Translate log() → write()
+    this.thirdPartyLogger.write(message);
+  }
+}
+
+const thirdParty = new ThirdPartyLogger();
+const logger = new LoggerAdapter(thirdParty);
+
+logger.log("Hello, Bohdan!");
