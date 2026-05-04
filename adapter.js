@@ -1,40 +1,26 @@
-// ===============================
-// Existing app interface
-// ===============================
-class PaymentProcessor {
-  pay(amount) {
-    throw new Error("pay() must be implemented")
+class ThirdPartyLogger {
+  write(message) {
+    console.log("Third-party:", message);
   }
 }
 
-// ===============================
-// Third‑party library (cannot modify)
-// ===============================
-class ThirdPartyPaymentSDK {
-  makePayment(value) {
-    console.log(`Third‑party payment of $${value} processed`)
+class Logger {
+  log(message) {}
+}
+
+class LoggerAdapter extends Logger {
+  constructor(thirdPartyLogger) {
+    super();
+    this.thirdPartyLogger = thirdPartyLogger;
+  }
+
+  log(message) {
+    // Translate log() → write()
+    this.thirdPartyLogger.write(message);
   }
 }
 
-// ===============================
-// Adapter — makes SDK compatible
-// ===============================
-class PaymentAdapter extends PaymentProcessor {
-  constructor(thirdPartySDK) {
-    super()
-    this.sdk = thirdPartySDK
-  }
+const thirdParty = new ThirdPartyLogger();
+const logger = new LoggerAdapter(thirdParty);
 
-  pay(amount) {
-    // Translate our interface → SDK interface
-    this.sdk.makePayment(amount)
-  }
-}
-
-// ===============================
-// Usage
-// ===============================
-const sdk = new ThirdPartyPaymentSDK()
-const processor = new PaymentAdapter(sdk)
-
-processor.pay(100) // Works even though SDK uses makePayment()
+logger.log("Hello, Bohdan!");
